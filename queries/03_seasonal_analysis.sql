@@ -32,10 +32,10 @@ WITH daily_metrics AS (
 SELECT 
   usage_date,
   customer_type,
-  ROUND(daily_total_kwh, 2) AS daily_total_kwh,
+  ROUND(daily_total_kwh, 2) as daily_total_kwh,
   active_customers,
   ROUND(daily_total_kwh / active_customers, 2) as avg_usage_per_customer,
-  ROUND(avg_temperature, 2) AS avg_temperature,
+  ROUND(avg_temperature, 2) as avg_temperature,
   FORMAT_DATE('%A', usage_date) as day_of_week,
   is_weekend,
   is_holiday,
