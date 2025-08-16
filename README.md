@@ -125,9 +125,14 @@ cca-bigquery-analysis/
 │   ├── 01_monthly_trends_analysis.sql
 │   ├── 02_seasonal_analysis.sql
 │   ├── 03_customer_ranking_analysis.sql
-│   └── 04_advanced_multi_table_analysis.sql
+│   ├── 04_advanced_multi_table_analysis.sql
+│   ├── summaries/
+│   │   └── 03_customer_ranking_summary.sql
+│   └── archive/
+│       ├── 00_data_exploration.sql
+│       └── 01_basic_exploration.sql
 └── data/
-    └──  synthetic_data_creation.sql
+    └── synthetic_data_creation.sql
 ```
 
 ## Sample Results: Customer Ranking Analysis
