@@ -12,9 +12,9 @@ SELECT
   city,
   customer_type,
   COUNT(*) as customer_count,
-  ROUND(AVG(avg_daily_kwh), 2) as avg_city_usage,
+  ROUND(AVG(avg_daily_kwh), 2) as avg_city_usage_kwh,
   ROUND(AVG(total_cost_ytd),2) as avg_annual_cost,
   ROUND(AVG(effective_rate_per_kwh),2) as avg_rate_per_kwh
 FROM `cca-bigquery-analytics.cca_demo.customer_rankings_results`
 GROUP BY city, customer_type
-ORDER BY avg_city_usage DESC
+ORDER BY avg_city_usage_kwh DESC
