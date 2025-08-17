@@ -1,7 +1,7 @@
 -- ================================================================
 -- Seasonal Usage Patterns with Moving Averages
 -- Advanced analytics for identifying trends and anomalies
--- File: queries/03_seasonal_analysis.sql
+-- File: queries/02_seasonal_analysis.sql
 -- Author: Cameron Wehrfritz
 -- Created: 2024-08-15
 -- ================================================================

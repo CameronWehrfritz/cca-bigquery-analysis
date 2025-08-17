@@ -1,7 +1,7 @@
 -- ================================================================
 -- Advanced Multi-Table Analysis with Complex JOINs
 -- Comprehensive customer lifecycle and program effectiveness analysis
--- File: queries/05_advanced_multi_table_analysis.sql
+-- File: queries/04_advanced_multi_table_analysis.sql
 -- Author: Cameron Wehrfritz
 -- Created: 2024-08-15
 -- ================================================================

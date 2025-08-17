@@ -1,7 +1,7 @@
 -- ================================================================
 -- Customer Usage Rankings and Percentile Analysis
 -- Advanced customer segmentation for utility account management
--- File: queries/04_customer_ranking_analysis.sql
+-- File: queries/03_customer_ranking_analysis.sql
 -- Author: Cameron Wehrfritz
 -- Created: 2024-08-15
 -- ================================================================

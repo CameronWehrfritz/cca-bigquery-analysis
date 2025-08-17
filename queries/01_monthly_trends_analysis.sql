@@ -1,7 +1,7 @@
 -- ================================================================
 -- Monthly Usage Trends with Year-over-Year and Month-over-Month Analysis
 -- Advanced analytics for identifying trends
--- File: queries/02_monthly_trends_analysis.sql
+-- File: queries/01_monthly_trends_analysis.sql
 -- Author: Cameron Wehrfritz
 -- Created: 2024-08-15
 -- ================================================================
