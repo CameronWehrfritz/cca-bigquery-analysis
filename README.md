@@ -5,7 +5,7 @@ Community Choice Aggregators (CCAs) are public agencies that provide electricity
 
 ## Project Overview
 
-This project demonstrates enterprise-level data analytics for CCA utility operations using Google BigQuery. The analysis portfolio showcases advanced SQL techniques applied to synthetic energy usage data, providing actionable insights for utility operations, customer management, and regulatory compliance.
+This project demonstrates enterprise-level data analytics for CCA utility operations using Google BigQuery. The analysis portfolio showcases advanced SQL techniques and modern analytics engineering practices applied to synthetic energy usage data, providing actionable insights for utility operations, customer management, and regulatory compliance.
 
 ## Dataset Description
 
@@ -19,39 +19,100 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 
 ## Technical Architecture
 
-**Platform:** Google BigQuery
+**Platform:** Google BigQuery with modern ELT architecture
 
 **Data Volume:** 39.59M records across 3 tables
 
-**Storage Strategy:** Date-partitioned tables optimized for time-series queries
+**Storage Strategy:** Tables partitioned by date and clustered by customer demographics for optimized query performance
 
-**Query Complexity:** Advanced analytics with multi-table JOINs and window functions
+**Analytics Layer:** dbt-powered data marts for business intelligence
+
+**ELT Pipeline with Layered Architecture:**
+- **Raw Data Layer**: `cca_demo` dataset (synthetic customer and usage data)
+- **Analytics Layer**: `cca_demo_dbt` dataset (dbt-generated data marts)
+
+## Technologies Used
+
+- **Data Warehouse**: Google BigQuery
+- **Analytics Engineering**: dbt (data build tool)
+- **Data Modeling**: SQL with partitioning and clustering optimization
+- **Cloud Platform**: GCP (Google Cloud Platform)
+- **Version Control**: Git/GitHub
+
+## Project Structure
+
+```
+├── cca_analytics_dbt/                  # dbt project
+│   ├── models/
+│   │   └── city_usage_summary.sql      # Data mart: usage by city & customer type
+│   └── dbt_project.yml                 # dbt configuration
+├── queries/
+│   ├── 01_monthly_trends_analysis.sql
+│   ├── 02_seasonal_analysis.sql
+│   ├── 03_customer_ranking_analysis.sql
+│   ├── 04_advanced_multi_table_analysis.sql
+│   ├── summaries/
+│   │   └── 03_customer_ranking_summary.sql
+│   └── archive/
+│       ├── 00_data_exploration.sql
+│       └── 01_basic_exploration.sql
+├── data/
+│   └── synthetic_data_creation.sql
+└── README.md
+```
 
 ## Analytics Portfolio
 
-### 1. Monthly Trends Analysis (`01_monthly_trends_analysis.sql`)
+### 1. Monthly Trends Analysis
 - **Purpose:** Year-over-year and month-over-month growth analysis
 - **Techniques:** LAG window functions, CTEs, seasonal pattern detection
 - **Business Value:** Capacity planning, regulatory reporting, growth forecasting
 - **Key Finding:** Consistent 30-50% YoY growth across all customer segments
 
-### 2. Seasonal Pattern Analysis (`02_seasonal_analysis.sql`)
+### 2. Seasonal Pattern Analysis
 - **Purpose:** Advanced time-series analysis with volatility smoothing
 - **Techniques:** Moving averages, conditional aggregations, variance calculations
 - **Business Value:** Demand response planning, weather correlation, anomaly detection
 - **Key Finding:** Clear seasonal patterns with winter usage peaks and summer efficiency valleys
 
-### 3. Customer Ranking Analysis (`03_customer_ranking_analysis.sql`)
+### 3. Customer Ranking Analysis
 - **Purpose:** Multi-dimensional customer segmentation and risk assessment
 - **Techniques:** Multiple window function types, percentile analysis, dynamic thresholds
 - **Business Value:** Account management, retention programs, targeted marketing
 - **Key Finding:** Automated identification of high-value customers and churn risks
 
-### 4. Advanced Multi-Table Analysis (`04_advanced_multi_table_analysis.sql`)
+### 4. Advanced Multi-Table Analysis
 - **Purpose:** Comprehensive customer lifecycle and program effectiveness measurement
 - **Techniques:** Complex JOINs, before/after analysis, city benchmarking, technology profiling
 - **Business Value:** Program ROI measurement, geographic performance analysis, opportunity identification
 - **Key Finding:** Quantified program impacts showing 8-12% usage reductions post-enrollment
+
+## Modern Analytics Engineering with dbt
+
+### Data Engineering Features
+- **Partitioned Tables**: `daily_usage_facts` partitioned by `usage_date` and clustered by `customer_type` and `city` for optimal query performance
+- **Synthetic Data Generation**: Realistic customer energy usage patterns with demographic and behavioral attributes
+- **Performance Optimization**: Strategic use of partitioning and clustering for large-scale data analysis
+
+### dbt Implementation
+- **Modern ELT Architecture**: Raw data transformation using dbt for scalable analytics
+- **Data Marts**: Business-focused aggregations for improved query performance
+- **Automated Dependencies**: dbt manages transformation dependencies and materialization
+
+### dbt Models
+
+#### `city_usage_summary`
+Data mart aggregating customer usage patterns by geography and customer type:
+- Customer counts by city and segment
+- Average daily usage (kWh)
+- Annual cost summaries
+- Rate analysis across regions
+
+**Results reveal distinct usage patterns:**
+- **Large Commercial**: ~840 kWh daily average usage
+- **Small Commercial**: ~124 kWh daily average usage  
+- **Residential**: ~31 kWh daily average usage
+- **Rate Consistency**: ~$0.20/kWh across most customer segments
 
 ## Technical Highlights
 
@@ -94,14 +155,21 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 - Service territory performance monitoring
 - Rate impact assessment
 
-## Getting Started
+## Setup Instructions
 
 ### Prerequisites
 - Google Cloud Platform account with BigQuery access
 - BigQuery command-line tool (`bq`) installed
-- **Dataset Generation:** Run `/data/synthetic_data_creation.sql` to create the CCA synthetic dataset (39.59M records across 3 tables)
+- **Dataset Generation:** Run `data/synthetic_data_creation.sql` to create the CCA synthetic dataset (39.59M records across 3 tables)
 
-### Running the Queries
+### dbt Setup
+1. **Virtual Environment**: Create and activate Python virtual environment
+2. **Install dbt**: `pip install dbt-bigquery`
+3. **Authentication**: Configure service account with BigQuery permissions
+4. **Initialize**: Run `dbt init` and configure profiles
+5. **Model Execution**: Run `dbt run` to create analytics layer
+
+### Running Traditional SQL Queries
 ```bash
 # Navigate to project directory
 cd cca-bigquery-analysis
@@ -115,24 +183,6 @@ bq query --use_legacy_sql=false --format=csv --max_rows=5000 < queries/03_custom
 # Save results for summary analysis
 bq query --use_legacy_sql=false --destination_table=cca_demo.customer_rankings_results < queries/03_customer_ranking_analysis.sql
 bq query --use_legacy_sql=false < queries/summaries/03_customer_ranking_summary.sql
-```
-
-### File Structure
-```
-cca-bigquery-analysis/
-├── README.md
-├── queries/
-│   ├── 01_monthly_trends_analysis.sql
-│   ├── 02_seasonal_analysis.sql
-│   ├── 03_customer_ranking_analysis.sql
-│   ├── 04_advanced_multi_table_analysis.sql
-│   ├── summaries/
-│   │   └── 03_customer_ranking_summary.sql
-│   └── archive/
-│       ├── 00_data_exploration.sql
-│       └── 01_basic_exploration.sql
-└── data/
-    └── synthetic_data_creation.sql
 ```
 
 ## Sample Results: Customer Ranking Analysis
@@ -158,13 +208,6 @@ cca-bigquery-analysis/
 | High Usage | 5,002 | 10.0% | 18,219 | 3,705 |
 | Low Usage | 5,001 | 10.0% | 13,074 | 2,671 |
 
-### Top Performers by Segment
-| Customer Segment | Customer Count | Percentage | Avg Usage (kWh) | Avg Revenue ($) |
-|------------------|----------------|------------|-----------------|-----------------|
-| Residential - Top 10% | 3,774 | 75.1% | 11,303 | 2,304 |
-| Small Commercial - Top 10% | 1,191 | 23.7% | 30,555 | 6,208 |
-| Large Commercial - Top 10% | 61 | 1.2% | 207,236 | 41,954 |
-
 ## Key Insights Generated
 
 - **Growth Patterns:** All customer segments showing consistent 30-50% year-over-year growth with residential leading adoption
@@ -173,19 +216,13 @@ cca-bigquery-analysis/
 - **Customer Segmentation:** Clear technology adoption patterns from "Full Tech Adopter" to "No Tech" enabling targeted program development
 - **Geographic Variance:** City-level performance differences of 20-30% indicating market penetration opportunities
 
-## Technologies Used
-
-- **Google BigQuery** - Data warehouse and analytics platform
-- **SQL** - Advanced analytics and data manipulation
-- **Google Cloud Storage** - Data staging and export
-- **Command Line Tools** - Automated query execution and results export
-
 ## Future Enhancements
 
+- Additional dbt models for customer risk segmentation
 - Real-time dashboard integration with BigQuery BI Engine
 - Machine learning models for demand forecasting
 - Automated alerting for usage anomalies
 
 ---
 
-*This project demonstrates production-ready analytics for utility operations, showcasing both technical SQL proficiency and domain expertise in energy sector data analysis.*
+*This project demonstrates production-ready analytics for utility operations, showcasing both traditional SQL proficiency and modern analytics engineering practices with domain expertise in energy sector data analysis.*
