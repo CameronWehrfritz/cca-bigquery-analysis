@@ -36,7 +36,7 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 - **Data Warehouse**: Google BigQuery
 - **Analytics Engineering**: dbt (data build tool)
 - **Data Modeling**: SQL with partitioning and clustering optimization
-- **Cloud Platform**: GCP (Google Cloud Platform)
+- **Cloud Platform**: Google Cloud Platform (GCP)
 - **Version Control**: Git/GitHub
 
 ## Project Structure
@@ -104,11 +104,27 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 #### `city_usage_summary`
 Data mart aggregating customer usage patterns by geography and customer type:
 - Customer counts by city and segment
-- Average daily usage (kWh)
+- Average daily usage (kWh) with explicit unit labeling
 - Annual cost summaries
 - Rate analysis across regions
 
-**Results reveal distinct usage patterns:**
+#### `executive_summary`  
+High-level business metrics view built from city usage data:
+- Total cities and customer segments served
+- Overall customer count and average usage
+- Peak and lowest usage segments identified
+- Demonstrates dbt dependency management with `{{ ref() }}`
+
+| Metric | Value |
+|--------|-------|
+| Total Cities | 8 |
+| Customer Segments | 3 |
+| Total Customers | 50,000 |
+| Overall Average Usage | 318 kWh |
+| Peak Segment Usage | 840 kWh (Large Commercial) |
+| Lowest Segment Usage | 31 kWh (Residential) |
+
+**Usage patterns by customer segment:**
 - **Large Commercial**: ~840 kWh daily average usage
 - **Small Commercial**: ~124 kWh daily average usage  
 - **Residential**: ~31 kWh daily average usage
