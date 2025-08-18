@@ -5,7 +5,7 @@ Community Choice Aggregators (CCAs) are public agencies that provide electricity
 
 ## Project Overview
 
-This project demonstrates enterprise-level data analytics for CCA utility operations using Google BigQuery. The analysis portfolio showcases advanced SQL techniques and modern analytics engineering practices applied to synthetic energy usage data, providing actionable insights for utility operations, customer management, and regulatory compliance.
+This project demonstrates enterprise-level data analytics and automation for CCA utility operations using Google BigQuery and Google Cloud Platform. The analysis portfolio showcases advanced SQL techniques, modern analytics engineering practices, and production-ready cloud automation applied to synthetic energy usage data, providing actionable insights for utility operations, customer management, and regulatory compliance.
 
 ## Dataset Description
 
@@ -19,7 +19,7 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 
 ## Technical Architecture
 
-**Platform:** Google BigQuery with modern ELT architecture
+**Platform:** Google BigQuery with modern ELT architecture and serverless automation
 
 **Data Volume:** 39.59M records across 3 tables
 
@@ -27,14 +27,18 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 
 **Analytics Layer:** dbt-powered data marts for business intelligence
 
+**Automation Layer:** Cloud Functions for automated monitoring and alerting
+
 **ELT Pipeline with Layered Architecture:**
 - **Raw Data Layer**: `cca_demo` dataset (synthetic customer and usage data)
 - **Analytics Layer**: `cca_demo_dbt` dataset (dbt-generated data marts)
+- **Automation Layer**: `cloud-functions` (serverless monitoring and alerting)
 
 ## Technologies Used
 
 - **Data Warehouse**: Google BigQuery
 - **Analytics Engineering**: dbt (data build tool)
+- **Cloud Automation**: Google Cloud Functions
 - **Data Modeling**: SQL with partitioning and clustering optimization
 - **Cloud Platform**: Google Cloud Platform (GCP)
 - **Version Control**: Git/GitHub
@@ -51,11 +55,16 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 │   ├── 02_seasonal_analysis.sql
 │   ├── 03_customer_ranking_analysis.sql
 │   ├── 04_advanced_multi_table_analysis.sql
+│   ├── 05_monthly_trends_alert.sql     # Automated alerting query
 │   ├── summaries/
 │   │   └── 03_customer_ranking_summary.sql
 │   └── archive/
 │       ├── 00_data_exploration.sql
 │       └── 01_basic_exploration.sql
+├── cloud-functions/
+│   └── usage-alerts/                   # Serverless alerting system
+│       ├── main.py                     # Cloud Function implementation
+│       └── requirements.txt            # Python dependencies
 ├── data/
 │   └── synthetic_data_creation.sql
 └── README.md
@@ -86,6 +95,46 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 - **Techniques:** Complex JOINs, before/after analysis, city benchmarking, technology profiling
 - **Business Value:** Program ROI measurement, geographic performance analysis, opportunity identification
 - **Key Finding:** Quantified program impacts showing 8-12% usage reductions post-enrollment
+
+### 5. Automated Usage Trends Alerting
+- **Purpose:** Production-ready monitoring system for anomalous growth patterns
+- **Techniques:** Cloud Functions, serverless automation, threshold-based alerting
+- **Business Value:** Proactive capacity planning, automated anomaly detection, operational efficiency
+- **Implementation:** Serverless function that monitors YoY growth rates and triggers alerts for values >60% (high growth) or <10% (low growth)
+
+## Cloud Automation
+
+### Serverless Alerting System
+Built with Google Cloud Functions to provide automated monitoring of usage trends:
+
+**Features:**
+- Automated detection of unusual year-over-year growth patterns
+- Threshold-based alerting (>60% high growth, <10% low growth warnings)
+- JSON API responses with structured alert data
+- Production-ready error handling and logging
+- Integration with BigQuery for real-time data analysis
+
+**Architecture:**
+- **Trigger:** HTTP endpoint (ready for Cloud Scheduler integration)
+- **Compute:** Python 3.11 Cloud Function with 512MB memory
+- **Data Source:** BigQuery with optimized query performance
+- **Output:** Structured JSON with alert details and business context
+
+**Alert Detection Logic:**
+```python
+# Example alert response for anomalous growth
+{
+  "status": "success",
+  "message": "Sent 1 alerts",
+  "alerts": [{
+    "customer_type": "Small Commercial",
+    "yoy_change_pct": 9.55,
+    "alert_status": "LOW_GROWTH_ALERT",
+    "alert_severity": "WARNING",
+    "alert_message": "Small Commercial segment: 9.6% YoY growth (33800918 kWh total)"
+  }]
+}
+```
 
 ## Modern Analytics Engineering with dbt
 
@@ -145,6 +194,12 @@ High-level business metrics view built from city usage data:
 - Minimal data scanning through targeted WHERE clauses
 - Efficient aggregation patterns for large datasets
 
+**Cloud Architecture:**
+- Serverless automation with Cloud Functions
+- IAM-secured BigQuery integration
+- Production-ready error handling and monitoring
+- Scalable event-driven architecture
+
 **Data Quality Management:**
 - Comprehensive null handling with NULLIF and COALESCE
 - Edge case management for division operations
@@ -158,6 +213,7 @@ High-level business metrics view built from city usage data:
 - Peak demand management and grid stability
 - Renewable energy integration planning
 - Infrastructure investment prioritization
+- Automated anomaly detection and alerting
 
 **Customer Management:**
 - Churn prediction and retention strategies
@@ -176,6 +232,7 @@ High-level business metrics view built from city usage data:
 ### Prerequisites
 - Google Cloud Platform account with BigQuery access
 - BigQuery command-line tool (`bq`) installed
+- Google Cloud SDK (`gcloud`) for Cloud Functions deployment
 - **Dataset Generation:** Run `data/synthetic_data_creation.sql` to create the CCA synthetic dataset (39.59M records across 3 tables)
 
 ### dbt Setup
@@ -185,6 +242,20 @@ High-level business metrics view built from city usage data:
 4. **Initialize**: Run `dbt init` and configure profiles
 5. **Model Execution**: Run `dbt run` to create analytics layer
 
+### Cloud Functions Deployment
+1. **Navigate to function directory**: `cd cloud-functions/usage-alerts`
+2. **Deploy function**: 
+   ```bash
+   gcloud functions deploy usage-trends-alert \
+     --runtime python311 \
+     --trigger-http \
+     --allow-unauthenticated \
+     --entry-point usage_trends_alert \
+     --memory 512MB \
+     --timeout 300s
+   ```
+3. **Test function**: Visit the deployed function URL to trigger alert detection
+
 ### Running Traditional SQL Queries
 ```bash
 # Navigate to project directory
@@ -192,6 +263,9 @@ cd cca-bigquery-analysis
 
 # Run individual queries
 bq query --use_legacy_sql=false --max_rows=1000 < queries/03_customer_ranking_analysis.sql
+
+# Test alerting query
+bq query --use_legacy_sql=false --max_rows=10 < queries/05_monthly_trends_alert.sql
 
 # Export results to CSV  
 bq query --use_legacy_sql=false --format=csv --max_rows=5000 < queries/03_customer_ranking_analysis.sql > customer_rankings.csv
@@ -231,14 +305,16 @@ bq query --use_legacy_sql=false < queries/summaries/03_customer_ranking_summary.
 - **Program Effectiveness:** Clean energy programs showing measurable impact with 8-12% usage reductions in participating customers
 - **Customer Segmentation:** Clear technology adoption patterns from "Full Tech Adopter" to "No Tech" enabling targeted program development
 - **Geographic Variance:** City-level performance differences of 20-30% indicating market penetration opportunities
+- **Operational Monitoring:** Automated detection of growth anomalies enables proactive capacity planning and operational response
 
 ## Future Enhancements
 
+- Cloud Scheduler integration for automated monthly alert execution
+- Email and Slack notification integration for alert distribution
 - Additional dbt models for customer risk segmentation
 - Real-time dashboard integration with BigQuery BI Engine
 - Machine learning models for demand forecasting
-- Automated alerting for usage anomalies
 
 ---
 
-*This project demonstrates production-ready analytics for utility operations, showcasing both traditional SQL proficiency and modern analytics engineering practices with domain expertise in energy sector data analysis.*
+*This project demonstrates production-ready analytics and automation for utility operations, showcasing SQL proficiency, modern analytics engineering practices, and cloud automation capabilities with domain expertise in energy sector data analysis.*
