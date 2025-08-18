@@ -30,9 +30,9 @@ SELECT
   LAG(monthly_kwh, 12) OVER (
     PARTITION BY customer_type
     ORDER BY usage_month
-  ) as previous_year_month_kwh,  -- Much clearer naming!
+  ) as previous_year_month_kwh,
  
-  -- Calculate YoY percentage change
+  -- Calculate year-over-year percentage change
   ROUND(
     (monthly_kwh - LAG(monthly_kwh, 12) OVER (
       PARTITION BY customer_type
@@ -49,7 +49,7 @@ SELECT
     ORDER BY usage_month
   ) as previous_month_kwh,
  
-  -- Calculate MoM percentage change
+  -- Calculate month-over-month percentage change
   ROUND(
     (monthly_kwh - LAG(monthly_kwh, 1) OVER (
       PARTITION BY customer_type
@@ -63,7 +63,3 @@ SELECT
 FROM monthly_data
 WHERE usage_month >= '2022-01-01'  -- Show complete time series
 ORDER BY customer_type, usage_month;
-
--- This pattern - using a CTE for aggregation followed by window functions - 
--- is essential for time-series analysis in data warehousing, especially for utility 
--- load forecasting and customer growth tracking.
