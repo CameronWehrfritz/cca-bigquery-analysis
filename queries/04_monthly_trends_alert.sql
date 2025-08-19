@@ -1,6 +1,9 @@
 -- ================================================================
 -- Monthly Usage Trends with Automated Alerting Logic
 -- Modification of original query for Cloud Function integration
+-- File: queries/04_monthly_trends_alert.sql
+-- Author: Cameron Wehrfritz
+-- Created: 2024-08-16
 -- ================================================================
 
 WITH monthly_data AS (

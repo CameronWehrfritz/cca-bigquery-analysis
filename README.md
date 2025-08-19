@@ -59,14 +59,12 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 ├── queries/
 │   ├── 01_monthly_trends_analysis.sql
 │   ├── 02_seasonal_analysis.sql
-│   ├── 03_customer_ranking_analysis.sql
-│   ├── 04_advanced_multi_table_analysis.sql
-│   ├── 05_monthly_trends_alert.sql     # Automated alerting query
-│   ├── summaries/
-│   │   └── 03_customer_ranking_summary.sql
+│   ├── 03_advanced_multi_table_analysis.sql
+│   ├── 04_monthly_trends_alert.sql     # Automated alerting query
 │   └── archive/
 │       ├── 00_data_exploration.sql
 │       └── 01_basic_exploration.sql
+│       ├── 03_customer_ranking_analysis.sql
 ├── cloud-functions/
 │   └── usage-alerts/                   # Serverless alerting system
 │       ├── main.py                     # Cloud Function implementation
@@ -77,6 +75,7 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 │   ├── 03_populate_usage_facts.sql     # Usage data population
 │   ├── 04_create_programs.sql          # Program enrollments
 │   └── 05_create_summary_stats.sql     # Data summary and quality metrics
+├── data_dictionary.md                  # Comprehensive schema documentation with key relationships
 └── README.md
 ```
 
@@ -341,10 +340,10 @@ cd cca-bigquery-analysis
 bq query --use_legacy_sql=false --max_rows=1000 < queries/01_monthly_trends_analysis.sql
 
 # Export results to CSV  
-bq query --use_legacy_sql=false --format=csv --max_rows=5000 < queries/03_customer_ranking_analysis.sql > customer_rankings.csv
+bq query --use_legacy_sql=false --format=csv --max_rows=5000 < queries/03_advanced_multi_table_analysis.sql > results.csv
 
 # Test alerting query
-bq query --use_legacy_sql=false --max_rows=10 < queries/05_monthly_trends_alert.sql
+bq query --use_legacy_sql=false --max_rows=10 < queries/04_monthly_trends_alert.sql
 ```
 
 ## Sample Results: Customer Ranking Analysis
