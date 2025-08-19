@@ -11,19 +11,22 @@ This project demonstrates enterprise-level data analytics and automation for CCA
 
 The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's territory with:
 
-- **39.59 million daily usage records** spanning January 2022 to August 2024
+- **39.6 million daily usage records** spanning January 2022 to August 2024
 - **50,000 customers** across residential, small commercial, and large commercial segments
 - **Customer demographics** including solar adoption, EV ownership, battery storage, and low-income qualifications
 - **Program enrollments** tracking participation in clean energy incentive programs
 - **Rate plans** reflecting actual CCA pricing structures (ECO, ECO100, ECOplus)
+- **Proper data modeling** with documented primary and foreign key relationships for data integrity
 
 ## Technical Architecture
 
 **Platform:** Google BigQuery with modern ELT architecture and serverless automation
 
-**Data Volume:** 39.59M records across 3 tables
+**Data Volume:** 39.6M records across 4 tables with proper relational structure
 
 **Storage Strategy:** Tables partitioned by date and clustered by customer demographics for optimized query performance
+
+**Data Modeling:** Documented primary and foreign keys with referential integrity design
 
 **Analytics Layer:** dbt-powered data marts for business intelligence
 
@@ -39,7 +42,7 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 - **Data Warehouse**: Google BigQuery
 - **Analytics Engineering**: dbt (data build tool)
 - **Cloud Automation**: Google Cloud Functions, Cloud Scheduler
-- **Data Modeling**: SQL with partitioning and clustering optimization
+- **Data Modeling**: SQL with partitioning, clustering, and primary/foreign key documentation
 - **Cloud Platform**: Google Cloud Platform (GCP)
 - **Version Control**: Git/GitHub
 
@@ -65,8 +68,12 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 │   └── usage-alerts/                   # Serverless alerting system
 │       ├── main.py                     # Cloud Function implementation
 │       └── requirements.txt            # Python dependencies
-├── data/
-│   └── synthetic_data_creation.sql
+├── data_setup/                         # Modular database setup scripts
+│   ├── 01_create_customers.sql         # Customer dimension with primary key
+│   ├── 02_create_usage_table_structure.sql  # Usage facts table structure
+│   ├── 03_populate_usage_facts.sql     # Usage data population
+│   ├── 04_create_programs.sql          # Program enrollments
+│   └── 05_create_summary_stats.sql     # Data summary and quality metrics
 └── README.md
 ```
 
@@ -142,6 +149,7 @@ Built with Google Cloud Functions and Cloud Scheduler to provide fully automated
 
 ### Data Engineering Features
 - **Partitioned Tables**: `daily_usage_facts` partitioned by `usage_date` and clustered by `customer_type` and `city` for optimal query performance
+- **Proper Data Modeling**: Primary and foreign key relationships documented for referential integrity
 - **Synthetic Data Generation**: Realistic customer energy usage patterns with demographic and behavioral attributes
 - **Performance Optimization**: Strategic use of partitioning and clustering for large-scale data analysis
 
@@ -196,6 +204,12 @@ High-level business metrics view built from city usage data:
 - Minimal data scanning through targeted WHERE clauses
 - Efficient aggregation patterns for large datasets
 
+**Data Modeling:**
+- Documented primary and foreign key relationships
+- Referential integrity design principles
+- Composite keys for fact table uniqueness
+- Proper normalization and denormalization strategies
+
 **Cloud Architecture:**
 - Serverless automation with Cloud Functions and Cloud Scheduler
 - IAM-secured BigQuery integration
@@ -235,7 +249,36 @@ High-level business metrics view built from city usage data:
 - Google Cloud Platform account with BigQuery access
 - BigQuery command-line tool (`bq`) installed
 - Google Cloud SDK (`gcloud`) for Cloud Functions deployment
-- **Dataset Generation:** Run `data/synthetic_data_creation.sql` to create the CCA synthetic dataset (39.59M records across 3 tables)
+
+### Database Setup
+The database creation uses a modular approach with 5 focused scripts:
+
+1. **Create customer dimension table:**
+   ```bash
+   bq query --use_legacy_sql=false < data_setup/01_create_customers.sql
+   ```
+
+2. **Create usage facts table structure:**
+   ```bash
+   bq query --use_legacy_sql=false < data_setup/02_create_usage_table_structure.sql
+   ```
+
+3. **Populate usage facts (39.6M records):**
+   ```bash
+   bq query --use_legacy_sql=false < data_setup/03_populate_usage_facts.sql
+   ```
+
+4. **Create program enrollments:**
+   ```bash
+   bq query --use_legacy_sql=false < data_setup/04_create_programs.sql
+   ```
+
+5. **Generate summary statistics:**
+   ```bash
+   bq query --use_legacy_sql=false < data_setup/05_create_summary_stats.sql
+   ```
+
+**Note:** Scripts must be run in order due to foreign key dependencies.
 
 ### dbt Setup
 1. **Virtual Environment**: Create and activate Python virtual environment
