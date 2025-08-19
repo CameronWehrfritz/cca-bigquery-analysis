@@ -51,7 +51,10 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 ```
 ├── cca_analytics_dbt/                  # dbt project
 │   ├── models/
-│   │   └── city_usage_summary.sql      # Data mart: usage by city & customer type
+│   │   ├── customer_rankings.sql          # Customer analytics and segmentation
+│   │   ├── city_usage_summary.sql         # Geographic usage aggregations
+│   │   ├── executive_summary.sql          # Executive dashboard metrics
+│   │   └── schema.yml                     # Source definitions and tests
 │   └── dbt_project.yml                 # dbt configuration
 ├── queries/
 │   ├── 01_monthly_trends_analysis.sql
@@ -153,12 +156,26 @@ Built with Google Cloud Functions and Cloud Scheduler to provide fully automated
 - **Partitioned Tables**: `daily_usage_facts` partitioned by `usage_date` and clustered by `customer_type` and `city` for optimal query performance
 - **Documented Relationships**: Primary and foreign key constraints documented for data integrity and query optimization
 - **Performance Optimization**: Balance between normalization (data integrity) and denormalization (query speed) for large-scale analytics
+
 ### dbt Implementation
 - **Modern ELT Architecture**: Raw data transformation using dbt for scalable analytics
-- **Data Marts**: Business-focused aggregations for improved query performance
+- **Three-Tier Pipeline**: Customer analytics foundation (customer_rankings), geographic aggregations (city_usage_summary), and executive metrics (executive_summary) with automated dependency management
 - **Automated Dependencies**: dbt manages transformation dependencies and materialization
 
 ### dbt Models
+
+#### `customer_rankings`
+Foundational analytical model providing comprehensive customer segmentation and risk assessment:
+- Multi-dimensional customer rankings (overall, by segment, by city)
+- Usage patterns including seasonal and weekend/weekday analysis
+- Financial metrics with effective rate calculations
+- Risk indicators for churn prediction and account management
+- Customer value segments (High Usage, Above Average, etc.)
+- Technology adoption profiling (solar, EV, battery storage combinations)
+- Percentile analysis for benchmarking within customer segments
+- Year-to-date usage volatility and behavioral pattern detection
+
+This model materializes as a table (50k rows) serving as the analytical foundation for downstream aggregations and business intelligence applications.
 
 #### `city_usage_summary`
 Data mart aggregating customer usage patterns by geography and customer type:
@@ -172,7 +189,6 @@ High-level business metrics view built from city usage data:
 - Total cities and customer segments served
 - Overall customer count and average usage
 - Peak and lowest usage segments identified
-- Demonstrates dbt dependency management with `{{ ref() }}`
 
 | Metric | Value |
 |--------|-------|
@@ -184,10 +200,12 @@ High-level business metrics view built from city usage data:
 | Lowest Segment Usage | 31 kWh (Residential) |
 
 **Usage patterns by customer segment:**
-- **Large Commercial**: ~840 kWh daily average usage
-- **Small Commercial**: ~124 kWh daily average usage  
-- **Residential**: ~31 kWh daily average usage
-- **Rate Consistency**: ~$0.20/kWh across most customer segments
+- Large Commercial: ~840 kWh daily average usage
+- Small Commercial: ~124 kWh daily average usage  
+- Residential: ~31 kWh daily average usage
+- Rate Consistency: ~$0.20/kWh across most customer segments
+
+**Pipeline Architecture:** Models demonstrate proper dbt dependency management with `{{ ref() }}` functions, ensuring automatic execution ordering and data lineage tracking.
 
 ## Technical Highlights
 
@@ -320,17 +338,13 @@ The database creation uses a modular approach with 5 focused scripts:
 cd cca-bigquery-analysis
 
 # Run individual queries
-bq query --use_legacy_sql=false --max_rows=1000 < queries/03_customer_ranking_analysis.sql
-
-# Test alerting query
-bq query --use_legacy_sql=false --max_rows=10 < queries/05_monthly_trends_alert.sql
+bq query --use_legacy_sql=false --max_rows=1000 < queries/01_monthly_trends_analysis.sql
 
 # Export results to CSV  
 bq query --use_legacy_sql=false --format=csv --max_rows=5000 < queries/03_customer_ranking_analysis.sql > customer_rankings.csv
 
-# Save results for summary analysis
-bq query --use_legacy_sql=false --destination_table=cca_demo.customer_rankings_results < queries/03_customer_ranking_analysis.sql
-bq query --use_legacy_sql=false < queries/summaries/03_customer_ranking_summary.sql
+# Test alerting query
+bq query --use_legacy_sql=false --max_rows=10 < queries/05_monthly_trends_alert.sql
 ```
 
 ## Sample Results: Customer Ranking Analysis

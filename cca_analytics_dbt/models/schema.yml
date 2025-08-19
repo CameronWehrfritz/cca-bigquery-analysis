@@ -1,0 +1,42 @@
+version: 2
+
+sources:
+  - name: cca_demo
+    description: "CCA customer and usage data from BigQuery"
+    database: cca-bigquery-analytics
+    schema: cca_demo
+    tables:
+      - name: customers
+        description: "Customer master data with demographics and enrollment info"
+      - name: daily_usage_facts
+        description: "Daily energy usage records with costs and environmental data"
+      - name: program_enrollments
+        description: "Customer participation in CCA programs and incentives"
+      - name: data_summary
+        description: "Metadata summary of dataset contents"
+
+models:
+  - name: customer_rankings
+    description: "Customer usage rankings and segmentation analysis with percentiles and risk indicators"
+    columns:
+      - name: customer_id
+        description: "Unique customer identifier"
+        tests:
+          - not_null
+          - unique
+      - name: total_kwh_ytd
+        description: "Total kilowatt-hours used year-to-date"
+        tests:
+          - not_null
+      - name: usage_segment
+        description: "Customer usage classification (High Usage, Above Average, etc.)"
+      
+  - name: city_usage_summary
+    description: "City-level aggregations of customer usage patterns by geography and customer type"
+    columns:
+      - name: city
+        description: "Customer service city"
+      - name: customer_type
+        description: "Customer classification (Residential, Small Commercial, etc.)"
+      - name: customer_count
+        description: "Number of customers in this city/type combination"
