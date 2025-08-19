@@ -27,7 +27,7 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 
 **Analytics Layer:** dbt-powered data marts for business intelligence
 
-**Automation Layer:** Cloud Functions for automated monitoring and alerting
+**Automation Layer:** Cloud Functions and Cloud Scheduler for automated monitoring and alerting
 
 **ELT Pipeline with Layered Architecture:**
 - **Raw Data Layer**: `cca_demo` dataset (synthetic customer and usage data)
@@ -38,7 +38,7 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 
 - **Data Warehouse**: Google BigQuery
 - **Analytics Engineering**: dbt (data build tool)
-- **Cloud Automation**: Google Cloud Functions
+- **Cloud Automation**: Google Cloud Functions, Cloud Scheduler
 - **Data Modeling**: SQL with partitioning and clustering optimization
 - **Cloud Platform**: Google Cloud Platform (GCP)
 - **Version Control**: Git/GitHub
@@ -98,14 +98,14 @@ The synthetic dataset models a realistic CCA serving Peninsula Clean Energy's te
 
 ### 5. Automated Usage Trends Alerting
 - **Purpose:** Production-ready monitoring system for anomalous growth patterns
-- **Techniques:** Cloud Functions, serverless automation, threshold-based alerting
+- **Techniques:** Cloud Functions, Cloud Scheduler, serverless automation, threshold-based alerting
 - **Business Value:** Proactive capacity planning, automated anomaly detection, operational efficiency
-- **Implementation:** Serverless function that monitors YoY growth rates and triggers alerts for values >60% (high growth) or <10% (low growth)
+- **Implementation:** Scheduled serverless function that monitors YoY growth rates and triggers alerts for values >60% (high growth) or <10% (low growth)
 
 ## Cloud Automation
 
 ### Serverless Alerting System
-Built with Google Cloud Functions to provide automated monitoring of usage trends:
+Built with Google Cloud Functions and Cloud Scheduler to provide fully automated monitoring of usage trends:
 
 **Features:**
 - Automated detection of unusual year-over-year growth patterns
@@ -113,12 +113,14 @@ Built with Google Cloud Functions to provide automated monitoring of usage trend
 - JSON API responses with structured alert data
 - Production-ready error handling and logging
 - Integration with BigQuery for real-time data analysis
+- Scheduled monthly execution with Cloud Scheduler
 
 **Architecture:**
-- **Trigger:** HTTP endpoint (ready for Cloud Scheduler integration)
+- **Trigger:** Cloud Scheduler (monthly on 1st at 9 AM PST)
 - **Compute:** Python 3.11 Cloud Function with 512MB memory
 - **Data Source:** BigQuery with optimized query performance
 - **Output:** Structured JSON with alert details and business context
+- **Automation:** Event-driven architecture requiring zero manual intervention
 
 **Alert Detection Logic:**
 ```python
@@ -195,7 +197,7 @@ High-level business metrics view built from city usage data:
 - Efficient aggregation patterns for large datasets
 
 **Cloud Architecture:**
-- Serverless automation with Cloud Functions
+- Serverless automation with Cloud Functions and Cloud Scheduler
 - IAM-secured BigQuery integration
 - Production-ready error handling and monitoring
 - Scalable event-driven architecture
@@ -256,6 +258,19 @@ High-level business metrics view built from city usage data:
    ```
 3. **Test function**: Visit the deployed function URL to trigger alert detection
 
+### Cloud Scheduler Setup
+1. **Create scheduled job**:
+   ```bash
+   gcloud scheduler jobs create http monthly-usage-alert \
+     --schedule="0 9 1 * *" \
+     --uri=YOUR_CLOUD_FUNCTION_URL \
+     --http-method=GET \
+     --time-zone="America/Los_Angeles" \
+     --description="Monthly CCA usage trends alert" \
+     --location=us-central1
+   ```
+2. **Test scheduled execution**: `gcloud scheduler jobs run monthly-usage-alert --location=us-central1`
+
 ### Running Traditional SQL Queries
 ```bash
 # Navigate to project directory
@@ -309,8 +324,7 @@ bq query --use_legacy_sql=false < queries/summaries/03_customer_ranking_summary.
 
 ## Future Enhancements
 
-- Cloud Scheduler integration for automated monthly alert execution
-- Email and Slack notification integration for alert distribution
+- Email and Slack notification integration for alert distribution  
 - Additional dbt models for customer risk segmentation
 - Real-time dashboard integration with BigQuery BI Engine
 - Machine learning models for demand forecasting
