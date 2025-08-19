@@ -150,7 +150,7 @@ data_summary (metadata table)
 
 **Example Optimized Query:**
 ```sql
-SELECT c.customer_type, AVG(d.kwh_used) as avg_usage
+SELECT c.customer_type, AVG(d.kwh_used) as avg_usage_kwh
 FROM `cca-bigquery-analytics.cca_demo.customers` c
 JOIN `cca-bigquery-analytics.cca_demo.daily_usage_facts` d
   ON c.customer_id = d.customer_id
