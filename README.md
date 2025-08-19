@@ -148,11 +148,11 @@ Built with Google Cloud Functions and Cloud Scheduler to provide fully automated
 ## Modern Analytics Engineering with dbt
 
 ### Data Engineering Features
+- **Hybrid Schema Design**: Constellation schema with multiple fact tables (`daily_usage_facts`, `program_enrollments`) and central customer dimension (`customers`)
+- **Strategic Denormalization**: Key customer attributes (type, city, rate_plan) denormalized in fact table for query performance while maintaining referential integrity
 - **Partitioned Tables**: `daily_usage_facts` partitioned by `usage_date` and clustered by `customer_type` and `city` for optimal query performance
-- **Proper Data Modeling**: Primary and foreign key relationships documented for referential integrity
-- **Synthetic Data Generation**: Realistic customer energy usage patterns with demographic and behavioral attributes
-- **Performance Optimization**: Strategic use of partitioning and clustering for large-scale data analysis
-
+- **Documented Relationships**: Primary and foreign key constraints documented for data integrity and query optimization
+- **Performance Optimization**: Balance between normalization (data integrity) and denormalization (query speed) for large-scale analytics
 ### dbt Implementation
 - **Modern ELT Architecture**: Raw data transformation using dbt for scalable analytics
 - **Data Marts**: Business-focused aggregations for improved query performance
