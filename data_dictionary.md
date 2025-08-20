@@ -1,7 +1,7 @@
-# CCA BigQuery Analytics - Complete Data Dictionary
+# CCA BigQuery Analytics - Data Dictionary
 
 ## Overview
-This data dictionary documents the complete data model for the CCA (Community Choice Aggregation) analytics dataset. The database follows proper relational design principles with documented primary and foreign key relationships to ensure data integrity and optimal query performance.
+This data dictionary documents the complete data model for the CCA (Community Choice Aggregation) analytics dataset. The database follows proper relational design principles with declared primary and foreign key relationships documented for data integrity governance and optimal query performance.
 
 **Database:** `cca-bigquery-analytics.cca_demo`  
 **Total Tables:** 4  
@@ -185,6 +185,6 @@ GROUP BY c.customer_type;
 
 ---
 
-*Last Updated: Current Date*  
+*Last Updated: 2025-08-20*  
 *Created by: Cameron Wehrfritz*  
 *Purpose: Technical documentation for CCA analytics database supporting utility operations and regulatory compliance*
