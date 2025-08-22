@@ -3,7 +3,8 @@
 -- Advanced customer segmentation for utility account management
 -- dbt model: models/customer_rankings.sql
 -- Author: Cameron Wehrfritz
--- Created: 2024-08-19
+-- Created: 2025-08-19
+-- Updated: 2025-08-22 - Updated with explicit units (kwh and dollars)
 -- ================================================================
 
 {{ config(materialized='table') }}
@@ -23,22 +24,22 @@ WITH customer_metrics AS (
     COUNT(u.usage_date) as days_with_usage,
     ROUND(SUM(u.kwh_used), 2) as total_kwh_ytd,
     ROUND(AVG(u.kwh_used), 2) as avg_daily_kwh,
-    ROUND(STDDEV(u.kwh_used), 2) as usage_volatility,
-    ROUND(MAX(u.kwh_used), 2) as peak_daily_usage,
-    ROUND(MIN(u.kwh_used),2 ) as min_daily_usage,
+    ROUND(STDDEV(u.kwh_used), 2) as usage_volatility_kwh,
+    ROUND(MAX(u.kwh_used), 2) as peak_daily_usage_kwh,
+    ROUND(MIN(u.kwh_used),2 ) as min_daily_usage_kwh,
 
     -- Financial metrics
     ROUND(SUM(u.cost_dollars), 2) as total_cost_ytd,
-    ROUND(AVG(u.cost_dollars), 2) as avg_daily_cost,
-    ROUND(SUM(u.cost_dollars) / SUM(u.kwh_used), 4) as effective_rate_per_kwh,
+    ROUND(AVG(u.cost_dollars), 2) as avg_daily_cost_dollars,
+    ROUND(SUM(u.cost_dollars) / SUM(u.kwh_used), 4) as effective_dollars_per_kwh,
     
     -- Seasonal patterns
-    ROUND(AVG(CASE WHEN EXTRACT(MONTH FROM u.usage_date) IN (12,1,2) THEN u.kwh_used END), 2) as avg_winter_usage,
-    ROUND(AVG(CASE WHEN EXTRACT(MONTH FROM u.usage_date) IN (6,7,8) THEN u.kwh_used END), 2) as avg_summer_usage,
+    ROUND(AVG(CASE WHEN EXTRACT(MONTH FROM u.usage_date) IN (12,1,2) THEN u.kwh_used END), 2) as avg_winter_usage_kwh,
+    ROUND(AVG(CASE WHEN EXTRACT(MONTH FROM u.usage_date) IN (6,7,8) THEN u.kwh_used END), 2) as avg_summer_usage_kwh,
     
     -- Weekend vs weekday patterns  
-    ROUND(AVG(CASE WHEN u.is_weekend THEN u.kwh_used END), 2) as avg_weekend_usage,
-    ROUND(AVG(CASE WHEN NOT u.is_weekend THEN u.kwh_used END), 2) as avg_weekday_usage
+    ROUND(AVG(CASE WHEN u.is_weekend THEN u.kwh_used END), 2) as avg_weekend_usage_kwh,
+    ROUND(AVG(CASE WHEN NOT u.is_weekend THEN u.kwh_used END), 2) as avg_weekday_usage_kwh
     
   FROM {{ source('cca_demo', 'daily_usage_facts') }} u
   JOIN {{ source('cca_demo', 'customers') }} c 
@@ -62,33 +63,33 @@ SELECT
   days_with_usage,
   total_kwh_ytd,
   avg_daily_kwh,
-  usage_volatility,
-  peak_daily_usage,
-  min_daily_usage,
+  usage_volatility_kwh,
+  peak_daily_usage_kwh,
+  min_daily_usage_kwh,
   
   -- Financial metrics
   total_cost_ytd,
-  avg_daily_cost,
-  effective_rate_per_kwh,
+  avg_daily_cost_dollars,
+  effective_dollars_per_kwh,
   
   -- Seasonal analysis
-  avg_winter_usage,
-  avg_summer_usage,
+  avg_winter_usage_kwh,
+  avg_summer_usage_kwh,
   ROUND(
     CASE 
-      WHEN avg_summer_usage > 0 
-      THEN (avg_winter_usage - avg_summer_usage) / avg_summer_usage * 100 
+      WHEN avg_summer_usage_kwh > 0 
+      THEN (avg_winter_usage_kwh - avg_summer_usage_kwh) / avg_summer_usage_kwh * 100 
       ELSE NULL 
     END, 1
   ) as winter_vs_summer_pct,
   
   -- Weekend vs weekday analysis
-  avg_weekend_usage,
-  avg_weekday_usage,
+  avg_weekend_usage_kwh,
+  avg_weekday_usage_kwh,
   ROUND(
     CASE 
-      WHEN avg_weekday_usage > 0 
-      THEN (avg_weekend_usage - avg_weekday_usage) / avg_weekday_usage * 100 
+      WHEN avg_weekday_usage_kwh > 0 
+      THEN (avg_weekend_usage_kwh - avg_weekday_usage_kwh) / avg_weekday_usage_kwh * 100 
       ELSE NULL 
     END, 1
   ) as weekend_vs_weekday_pct,
@@ -119,10 +120,10 @@ SELECT
   ROUND(PERCENT_RANK() OVER (ORDER BY total_cost_ytd) * 100, 1) as revenue_percentile,
   
   -- Usage efficiency ranking (kwh per dollar)
-  ROW_NUMBER() OVER (ORDER BY effective_rate_per_kwh ASC) as efficiency_rank,
+  ROW_NUMBER() OVER (ORDER BY effective_dollars_per_kwh ASC) as efficiency_rank,
   
   -- Volatility ranking (risk assessment)
-  NTILE(5) OVER (ORDER BY usage_volatility) as volatility_quintile,
+  NTILE(5) OVER (ORDER BY usage_volatility_kwh) as volatility_quintile,
   
   -- Customer value segments
   CASE 
@@ -141,7 +142,7 @@ SELECT
   CASE 
     WHEN avg_daily_kwh < 5 THEN 'Potential Churn Risk'
     WHEN days_with_usage < 200 THEN 'Irregular Usage'
-    WHEN usage_volatility > avg_daily_kwh * 2 THEN 'High Volatility'
+    WHEN usage_volatility_kwh > avg_daily_kwh * 2 THEN 'High Volatility'
     ELSE 'Stable Customer'
   END as risk_indicator
 

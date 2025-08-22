@@ -3,7 +3,7 @@
 -- High-level metrics aggregated from city usage patterns
 -- dbt model: models/executive_summary.sql
 -- Author: Cameron Wehrfritz
--- Created: 2024-08-16
+-- Created: 2025-08-16
 -- ================================================================
 
 {{ config(materialized='view') }}

@@ -56,9 +56,12 @@ data_summary (metadata table)
 
 **Purpose:** Daily energy usage fact table with consumption, cost, and contextual data.
 
-**Primary Key:** `(usage_date, customer_id)` (Composite, declared)  
-**Foreign Key:** `customer_id` → `customers.customer_id` (declared) 
-**Partitioning:** `usage_date` (daily partitions)  
+**Primary Key:** `(usage_date, customer_id)` (Composite, declared)
+
+**Foreign Key:** `customer_id` → `customers.customer_id` (declared)
+
+**Partitioning:** `usage_date` (daily partitions)
+
 **Clustering:** `customer_type`, `city`
 
 | Column Name | Data Type | Nullable | Description | Business Rules | Example Values |
@@ -87,7 +90,8 @@ data_summary (metadata table)
 
 **Purpose:** Customer participation in CCA programs and incentive tracking.
 
-**Primary Key:** `(customer_id, program_name, program_enrollment_date)` (Composite, declared)  
+**Primary Key:** `(customer_id, program_name, program_enrollment_date)` (Composite, declared)
+
 **Foreign Key:** `customer_id` → `customers.customer_id` (declared)
 
 | Column Name | Data Type | Nullable | Description | Business Rules | Example Values |
